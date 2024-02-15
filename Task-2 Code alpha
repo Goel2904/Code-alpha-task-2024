@@ -1,0 +1,80 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <filesystem>
+
+namespace fs = std::filesystem;
+
+void displayMenu() {
+    std::cout << "1. List files and directories\n"
+              << "2. Create directory\n"
+              << "3. Copy file\n"
+              << "4. Move file\n"
+              << "5. Exit\n"
+              << "Enter your choice: ";
+}
+
+void listFiles(const std::string& path) {
+    for (const auto& entry : fs::directory_iterator(path)) {
+        std::cout << entry.path().filename() << '\n';
+    }
+}
+
+void createDirectory(const std::string& path) {
+    std::string dirName;
+    std::cout << "Enter directory name: ";
+    std::cin >> dirName;
+
+    fs::create_directory(path + "/" + dirName);
+    std::cout << "Directory created successfully.\n";
+}
+
+void copyFile(const std::string& sourcePath, const std::string& destinationPath) {
+    std::string fileName;
+    std::cout << "Enter file name to copy: ";
+    std::cin >> fileName;
+
+    fs::copy_file(sourcePath + "/" + fileName, destinationPath + "/" + fileName, fs::copy_options::overwrite_existing);
+    std::cout << "File copied successfully.\n";
+}
+
+void moveFile(const std::string& sourcePath, const std::string& destinationPath) {
+    std::string fileName;
+    std::cout << "Enter file name to move: ";
+    std::cin >> fileName;
+
+    fs::rename(sourcePath + "/" + fileName, destinationPath + "/" + fileName);
+    std::cout << "File moved successfully.\n";
+}
+
+int main() {
+    std::string currentPath = fs::current_path().string();
+    int choice;
+
+    do {
+        displayMenu();
+        std::cin >> choice;
+
+        switch (choice) {
+            case 1:
+                listFiles(currentPath);
+                break;
+            case 2:
+                createDirectory(currentPath);
+                break;
+            case 3:
+                copyFile(currentPath, currentPath);
+                break;
+            case 4:
+                moveFile(currentPath, currentPath);
+                break;
+            case 5:
+                std::cout << "Exiting the file manager.\n";
+                break;
+            default:
+                std::cout << "Invalid choice. Please try again.\n";
+        }
+    } while (choice != 5);
+
+    return 0;
+}
